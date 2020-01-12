@@ -1,5 +1,7 @@
 # vue-experiment
 
+I want to practice Vue-cli + SPA + i18n.
+
 ## Project setup
 ```
 yarn install
