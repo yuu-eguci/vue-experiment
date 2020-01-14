@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div>
     This is Page1.
     {{ $t("message.welcome") }}
   </div>

@@ -1,7 +1,7 @@
 <template>
   <div>
-    This is Page3.
-    {{ $t("message.welcome") }}
+    This is <span class="pagename">PagesLayout</span>.
+    <router-view />
   </div>
 </template>
 

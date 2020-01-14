@@ -1,6 +1,7 @@
 <template>
   <div>
-    This is Page3.
+    <img src="@/assets/logo.png">
+    This is <span class="pagename">Index page</span>.
     {{ $t("message.welcome") }}
   </div>
 </template>
