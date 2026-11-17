@@ -133,6 +133,7 @@ docker run --rm -it -p 8080:8080 vue-experiment
 Open http://localhost:8080/. Press Ctrl+C to stop the server.
 Keep `-it`: without a terminal, Ctrl+C does not reach the dev server and the container keeps running (stop it with `docker stop`).
 The source files are copied into the image, so run `docker build` again after you change them.
+If port 8080 or 4173 is already in use on the host, change only the host side of `-p`, for example `-p 18080:8080`, and open that port instead.
 
 To run the checks in the container, pass the command:
 

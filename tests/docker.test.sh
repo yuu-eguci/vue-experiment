@@ -14,7 +14,8 @@ failed=0
 
 cleanup() {
   if [ -n "$container" ]; then docker rm -f "$container" >/dev/null 2>&1 || true; fi
-  docker image rm -f "$image" >/dev/null 2>&1 || true
+  # 付けたタグだけを外します。同じ内容のイメージにほかのタグがあれば、そのイメージは残ります。
+  docker image rm "$image" >/dev/null 2>&1 || true
   rm -rf "$context"
 }
 trap cleanup EXIT
@@ -43,7 +44,8 @@ done
 docker build -q -t "$image" "$context" >/dev/null
 
 no_local_env_files() {
-  found=$(docker run --rm "$image" find /app -path /app/node_modules -prune -o \( -name '.env.local' -o -name '.env.*.local' \) -print)
+  # check の中では set -e が働かないため、コマンドの失敗を見逃さないように終了ステータスも確かめます。
+  found=$(docker run --rm "$image" find /app -path /app/node_modules -prune -o \( -name '.env.local' -o -name '.env.*.local' \) -print) || return 1
   [ -z "$found" ] || { echo "$found"; return 1; }
 }
 check 'ローカル用の env ファイルはイメージに含まれません' no_local_env_files
@@ -75,12 +77,18 @@ content_type_is() {
   esac
 }
 
+# /spa.html が、スクリプトを含まない Spa のページであるかどうかを返します。
+static_spa_html() {
+  body=$(curl -fsS "$base/spa.html") || return 1
+  printf '%s' "$body" | grep -q 'Spa' && ! printf '%s' "$body" | grep -q '<script'
+}
+
 check '/ は既定のアプリのエントリーを読み込む index.html を返します' body_contains / 'src="/src/main.ts"'
 for page in page1 page2 page3; do
   check "/$page は履歴モードのルーター用に index.html を返します" body_contains "/$page" 'src="/src/main.ts"'
 done
 check '/src/main.ts は Vue のアプリを作るスクリプトを返します' body_contains /src/main.ts 'createApp'
-check '/spa.html はスクリプトを含まない静的なページを返します' sh -c "curl -fsS '$base/spa.html' | grep -q 'Spa' && ! curl -fsS '$base/spa.html' | grep -q '<script'"
+check '/spa.html はスクリプトを含まない静的なページを返します' static_spa_html
 check '/favicon.ico を返します' content_type_is /favicon.ico image/
 check '/src/assets/logo.png を返します' content_type_is /src/assets/logo.png image/png
 
