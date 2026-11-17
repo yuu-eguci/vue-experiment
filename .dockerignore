@@ -3,3 +3,7 @@ node_modules
 dist
 npm-debug.log*
 .DS_Store
+# Vite のローカル用 env ファイルには秘密情報が入ることがあるため、イメージに含めません。
+# .gitignore と同じく、どの階層にあっても除外します。
+**/.env.local
+**/.env.*.local

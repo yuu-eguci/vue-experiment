@@ -50,6 +50,8 @@ npx vite --config vite.mpa.config.mts
 npx vite build --config vite.mpa.config.mts
 ```
 
+Without Node.js on the host, use the Docker commands in [Docker](#docker).
+
 ## Build output
 
 Both setups write the build to `dist/` with the same layout that Vue CLI 4 used (`<hash>` is an 8-character hex content hash):
@@ -73,6 +75,8 @@ Both setups write the build to `dist/` with the same layout that Vue CLI 4 used 
 
 Node.js 26 (Active LTS). The exact version is in `.node-version`.
 npm comes with Node.js. Use `npm ci` so that `package-lock.json` is respected.
+
+Node.js is not needed on the host if you use Docker instead (see [Docker](#docker)).
 
 ## Project setup
 ```
@@ -119,18 +123,50 @@ npm run test:typecheck
 ## Docker
 
 The `Dockerfile` installs the dependencies with the Node.js version above and starts the dev server.
+Only Docker is needed on the host.
 
 ```
 docker build -t vue-experiment .
-docker run --rm -p 8080:8080 vue-experiment
+docker run --rm -it -p 8080:8080 vue-experiment
 ```
 
-To run the checks in the container instead, pass the command, for example `docker run --rm vue-experiment npm test`.
+Open http://localhost:8080/. Press Ctrl+C to stop the server.
+Keep `-it`: without a terminal, Ctrl+C does not reach the dev server and the container keeps running (stop it with `docker stop`).
+The source files are copied into the image, so run `docker build` again after you change them.
+If port 8080 or 4173 is already in use on the host, change only the host side of `-p`, for example `-p 18080:8080`, and open that port instead.
+
+To run the checks in the container, pass the command:
+
+```
+docker run --rm vue-experiment npm run typecheck
+docker run --rm vue-experiment npx eslint .
+docker run --rm vue-experiment npm test
+docker run --rm vue-experiment npm run test:typecheck
+```
+
+To build for production and preview the build on http://localhost:4173/:
+
+```
+docker run --rm -it -p 4173:4173 vue-experiment sh -c "npm run build && npm run preview -- --host 0.0.0.0"
+```
+
+To try the MPA setup, start the dev server on http://localhost:8080/, or build it and preview the build on http://localhost:4173/:
+
+```
+docker run --rm -it -p 8080:8080 vue-experiment npx vite --config vite.mpa.config.mts --host 0.0.0.0
+docker run --rm -it -p 4173:4173 vue-experiment sh -c "npx vite build --config vite.mpa.config.mts && npx vite preview --config vite.mpa.config.mts --host 0.0.0.0"
+```
+
+`.dockerignore` keeps `node_modules`, `dist` and the local env files (`.env.local` and `.env.*.local`, which Vite reads for local-only values such as secrets) out of the image.
+
+To check the image itself, run `sh tests/docker.test.sh` (needs Docker and curl).
+It builds the image with dummy local env files in a temporary copy of the project, checks that they are not in the image, starts the default command and checks the HTTP responses of the dev server.
+It removes the image and the container it created when it finishes.
 
 ## CI
 
 `.github/workflows/ci.yml` runs on pull requests and on pushes to `master`.
-It type-checks, lints, runs the tests, builds both setups and builds the Docker image. It does not deploy anything.
+It type-checks, lints, runs the tests, builds both setups, builds the Docker image, runs the tests in the container and runs `tests/docker.test.sh`. It does not deploy anything.
 
 ### Customize configuration
 See [Vite Configuration Reference](https://vite.dev/config/).

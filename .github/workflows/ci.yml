@@ -34,3 +34,5 @@ jobs:
       - uses: actions/checkout@v7.0.1
       - run: docker build -t vue-experiment:ci .
       - run: docker run --rm vue-experiment:ci npm test
+      # ローカル用の env ファイルがイメージに含まれないことと、起動したコンテナーの HTTP の応答を確かめます。
+      - run: sh tests/docker.test.sh
