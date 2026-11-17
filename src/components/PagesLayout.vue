@@ -5,10 +5,6 @@
   </div>
 </template>
 
-<script>
-
-</script>
-
 <style scoped>
   /* FIXME: こう書くと pageslayout の .pagename にだけ適用される。でもこれを外部ファイルから読み込む方法がわからない。 */
   .pagename {

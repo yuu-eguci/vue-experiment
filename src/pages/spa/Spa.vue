@@ -19,11 +19,12 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 // ここでインポートして、
 import Footer from '../../components/Footer.vue'
 
-export default {
+export default defineComponent({
   name: 'App',
   components: {
     Footer  // ここで template 内で使う許可を得て、ほんで template 内で使うという流れっぽい。
@@ -33,7 +34,7 @@ export default {
       this.$i18n.locale = (this.$i18n.locale === 'ja') ? 'en' : 'ja'
     }
   }
-}
+})
 </script>
 
 <style>

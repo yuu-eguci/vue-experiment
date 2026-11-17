@@ -117,11 +117,10 @@ let failed = 0
 for (const [name, test] of Object.entries(tests)) {
   try {
     test()
-    console.log(`ok - ${name}`)
+    process.stdout.write(`ok - ${name}\n`)
   } catch (error) {
     failed += 1
-    console.log(`not ok - ${name}`)
-    console.log(error.message)
+    process.stdout.write(`not ok - ${name}\n${error.message}\n`)
   }
 }
 process.exitCode = failed === 0 ? 0 : 1
