@@ -6,14 +6,16 @@
     </footer>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   // これ何のために要るのかわからん。わかるまでコメントアウト。
   // name: 'footer',
   props: {
     msg: String
   }
-}
+})
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
