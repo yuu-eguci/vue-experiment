@@ -50,7 +50,24 @@ npx vite --config vite.mpa.config.mts
 npx vite build --config vite.mpa.config.mts
 ```
 
-Both setups write the build to `dist/` (`dist/index.html`, plus `dist/spa.html` for the MPA setup). Static files in `public/` are copied to `dist/` as they are.
+## Build output
+
+Both setups write the build to `dist/` with the same layout that Vue CLI 4 used (`<hash>` is an 8-character hex content hash):
+
+| Default setup (`npm run build`) | MPA setup (`vite.mpa.config.mts`) |
+|---|---|
+| `dist/index.html` | `dist/index.html` |
+| `dist/spa.html` (static page, see below) | `dist/spa.html` (the SPA page) |
+| `dist/favicon.ico` | `dist/favicon.ico` |
+| `dist/js/app.<hash>.js` (+ `.map`) | `dist/js/index.<hash>.js` (+ `.map`) |
+| `dist/js/chunk-vendors.<hash>.js` (+ `.map`) | `dist/js/spa.<hash>.js` (+ `.map`) |
+| `dist/css/app.<hash>.css` | `dist/js/chunk-vendors.<hash>.js` (+ `.map`) |
+| `dist/img/logo.<hash>.png` | |
+
+- Code from `node_modules` goes to `chunk-vendors`. Images go to `img/`, fonts to `fonts/` and media files to `media/`, as in Vue CLI.
+- Static files in `public/` are copied to `dist/` as they are.
+- Vue CLI copied `public/spa.html` into the default build without rendering its `<%= BASE_URL %>` placeholder. The default build still writes `dist/spa.html`, but generates it from `src/pages/spa.html` with the base path filled in and without the MPA entry script, so it is the same static page with a working favicon link. `npm run serve` serves the same page at `/spa.html`.
+- The HTML files load the scripts as ES modules (`<script type="module">` and `<link rel="modulepreload">`), because Vite outputs ES modules.
 
 ## Requirements
 
