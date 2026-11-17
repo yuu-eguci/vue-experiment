@@ -6,7 +6,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { build } from 'vite'
-import { afterAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 const root = path.resolve(import.meta.dirname, '..')
 const outDirs: string[] = []
@@ -36,14 +36,13 @@ function listFiles(outDir: string, dir = outDir): string[] {
 }
 
 // 出力されたファイルが、パターン (ハッシュ部分は `${hash}`) とちょうど 1 対 1 で対応することを確かめます。
-function expectLayout(outDir: string, patterns: string[]): string[] {
+function expectLayout(outDir: string, patterns: string[]): void {
   const files = listFiles(outDir).sort()
   const regexps = patterns.map((pattern) => new RegExp(`^${pattern.replace(/\./g, '\\.')}$`))
   for (const regexp of regexps) {
     expect(files.filter((file) => regexp.test(file)), `${regexp} に一致するファイルが 1 つではありません: ${files.join(', ')}`).toHaveLength(1)
   }
   expect(files.filter((file) => !regexps.some((regexp) => regexp.test(file))), '想定していないファイルがあります。').toEqual([])
-  return files
 }
 
 function findFile(files: string[], pattern: string): string {
@@ -96,9 +95,13 @@ describe('既定の構成 (vite.config.mts) の本番ビルド', () => {
   let outDir: string
   let files: string[]
 
-  it('Vue CLI 4 と同じパスにファイルを出力します', async () => {
+  beforeAll(async () => {
     outDir = await buildWith('vite.config.mts')
-    files = expectLayout(outDir, [
+    files = listFiles(outDir)
+  })
+
+  it('Vue CLI 4 と同じパスにファイルを出力します', () => {
+    expectLayout(outDir, [
       'index.html',
       'spa.html',
       'favicon.ico',
@@ -143,9 +146,13 @@ describe('MPA の構成 (vite.mpa.config.mts) の本番ビルド', () => {
   let outDir: string
   let files: string[]
 
-  it('Vue CLI 4 と同じパスにファイルを出力します', async () => {
+  beforeAll(async () => {
     outDir = await buildWith('vite.mpa.config.mts')
-    files = expectLayout(outDir, [
+    files = listFiles(outDir)
+  })
+
+  it('Vue CLI 4 と同じパスにファイルを出力します', () => {
+    expectLayout(outDir, [
       'index.html',
       'spa.html',
       'favicon.ico',
