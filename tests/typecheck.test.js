@@ -82,7 +82,25 @@ function parseErrors(output) {
   return errors
 }
 
+// src 配下の .ts と .vue (型宣言ファイルを除きます) を、root からの相対パスで列挙します。
+function listSourceFiles(dir) {
+  return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const fullPath = path.join(dir, entry.name)
+    if (entry.isDirectory()) {
+      return listSourceFiles(fullPath)
+    }
+    const isSource = /\.(ts|vue)$/.test(entry.name) && !entry.name.endsWith('.d.ts')
+    return isSource ? [path.relative(root, fullPath).split(path.sep).join('/')] : []
+  })
+}
+
 const tests = {
+  'src 配下のすべての .ts と .vue に型の誤りを入れて確かめます'() {
+    const mutatedFiles = new Set(mutations.map((mutation) => mutation.file))
+    const uncovered = listSourceFiles(path.join(root, 'src')).filter((file) => !mutatedFiles.has(file))
+    assert.deepStrictEqual(uncovered, [], `型の誤りを入れていないファイルがあります。mutations に追加してください: ${uncovered.join(', ')}`)
+  },
+
   '型の誤りを入れていないコードは型チェックに成功します'() {
     const dir = makeProjectCopy()
     try {
