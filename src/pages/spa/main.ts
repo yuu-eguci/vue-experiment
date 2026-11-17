@@ -1,13 +1,7 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
 import Spa from './Spa.vue'
 import router from './router'
-import VueI18n from 'vue-i18n'
-
-// Vue の起動時のプロダクションのヒントを表示する(true)。
-Vue.config.productionTip = false
-
-// vue-i18n を Vue にインストールする。
-Vue.use(VueI18n)
+import { createI18n } from 'vue-i18n'
 
 // NOTE: main.js ではなく各コンポーネントごとに定義したいんだけど……
 const messages = {
@@ -25,14 +19,17 @@ const messages = {
   }
 }
 
-// VueI18n のコンストラクタには locale と messages。
-const i18n = new VueI18n({
+// createI18n には locale と messages を渡します。
+// Legacy API モードは vue-i18n 11 で非推奨のため、Composition API モード (legacy: false) を使います。
+// この場合もテンプレートの $t と this.$i18n.locale はそのまま使えます。
+const i18n = createI18n({
+  legacy: false,
   locale: 'en',
   messages,
 })
 
-new Vue({
-  router,
-  i18n,
-  render: h => h(Spa),
-}).$mount('#app')
+// アプリを作り、ルーターと vue-i18n をインストールしてから #app にマウントします。
+createApp(Spa)
+  .use(router)
+  .use(i18n)
+  .mount('#app')
