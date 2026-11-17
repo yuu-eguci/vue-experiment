@@ -1,5 +1,6 @@
 <template>
-  <div id="app">
+  <div>
+    <!-- Vue 3 ではマウント先の #app の中に描画されるため、#app が重複しないようにこのルート要素には id を付けていません。 -->
     <div id="header">
       <!-- Links. -->
       <!-- NOTE: プログラム内で遷移するには router.push({ name: 'user', params: { userId: 123 }}) こんな感じ。 -->

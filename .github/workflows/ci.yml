@@ -1,0 +1,36 @@
+# プルリクエストと master への push で、型チェック、Lint、テスト、ビルドを実行します。
+# 公開やデプロイは行いません。
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      # npm run lint は自動修正を行うため、CI では修正せずに検査だけを行います。
+      - run: npx eslint .
+      - run: npm test
+      - run: npm run test:typecheck
+      - run: npm run build
+      - run: npx vite build --config vite.mpa.config.mts
+
+  docker:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - run: docker build -t vue-experiment:ci .
+      - run: docker run --rm vue-experiment:ci npm test

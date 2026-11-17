@@ -1,16 +1,13 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import Index from './components/Index.vue'
 import PagesLayout from './components/PagesLayout.vue'
 import Page1 from './components/Page1.vue'
 import Page2 from './components/Page2.vue'
 import Page3 from './components/Page3.vue'
 
-Vue.use(VueRouter)
-
-export default new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
+// HTML5 History モードのルーターです。ベースパスは Vite の base (既定では '/') に合わせます。
+export default createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     // トップページ。1種類目のデザインを使う。
     {

@@ -13,8 +13,8 @@ const root = path.resolve(__dirname, '..')
 // file: 書き換えるファイル、from: 元の記述 (ファイル内で一意である必要があります)、
 // to: 型の誤りを含む記述、code: 期待する TypeScript のエラーコードです。
 const mutations = [
-  { file: 'src/main.ts', from: "locale: 'en',", to: 'locale: 0,', code: 'TS2322' },
-  { file: 'src/router.ts', from: "mode: 'history',", to: "mode: 'browser',", code: 'TS2322' },
+  { file: 'src/main.ts', from: "locale: 'en',", to: 'locale: 0,', code: 'TS2769' },
+  { file: 'src/router.ts', from: 'history: createWebHistory(import.meta.env.BASE_URL),', to: "history: 'history',", code: 'TS2322' },
   { file: 'src/App.vue', from: '<Footer msg="Welcome to Your Vue.js App"/>', to: '<Footer :msg="404"/>', code: 'TS2322' },
   { file: 'src/App.vue', from: "? 'en' : 'ja'", to: "? 'en' : 0", code: 'TS2322' },
   { file: 'src/components/Footer.vue', from: '{{ msg }}', to: '{{ msg.toFixed() }}', code: 'TS2551' },
@@ -25,8 +25,8 @@ const mutations = [
   { file: 'src/components/Page3.vue', from: '$t("message.welcome")', to: '$t(404)', code: 'TS2345' },
   { file: 'src/components/PagesLayout.vue', from: '>PagesLayout<', to: '>{{ undefinedName }}<', code: 'TS2339' },
   { file: 'src/pages/index/Index.vue', from: 'This is index page.', to: 'This is {{ undefinedName }} page.', code: 'TS2339' },
-  { file: 'src/pages/index/main.ts', from: "$mount('#app')", to: '$mount(404)', code: 'TS2345' },
-  { file: 'src/pages/spa/main.ts', from: "locale: 'en',", to: 'locale: 0,', code: 'TS2322' },
+  { file: 'src/pages/index/main.ts', from: "mount('#app')", to: 'mount(404)', code: 'TS2345' },
+  { file: 'src/pages/spa/main.ts', from: "locale: 'en',", to: 'locale: 0,', code: 'TS2769' },
   { file: 'src/pages/spa/router.ts', from: 'component: Page1,', to: "component: 'Page1',", code: 'TS2322' },
   { file: 'src/pages/spa/Spa.vue', from: '<Footer msg="Welcome to Your Vue.js App"/>', to: '<Footer :msg="404"/>', code: 'TS2322' },
   { file: 'src/pages/spa/Spa.vue', from: "? 'en' : 'ja'", to: "? 'en' : 0", code: 'TS2322' },
